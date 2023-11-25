@@ -5,4 +5,10 @@ interface UserRequest {
     role?: string;
 }
 
-export {UserRequest}
+interface UserResponse {
+    id: number;
+    username: string;
+    email: string;
+}
+
+export {UserRequest, UserResponse}

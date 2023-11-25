@@ -11,7 +11,9 @@ class CarsRepository {
     return listCar;
   }
   static async getCars(): Promise<Car[]> {
-    const listCar = await CarEntity.query();
+    const listCar = await CarEntity.query()
+      .withGraphFetched("[created_by,updated_by,deleted_by]")
+      .whereNull("delete_at");
     return listCar;
   }
 
@@ -27,7 +29,8 @@ class CarsRepository {
       car_size: car.car_size,
       status_rental: car.status_rental,
       car_img: car.car_img,
-      created_at: new Date(),
+      create_by: car.create_by,
+      create_at: car.create_at,
     });
 
     return createdCar;
@@ -37,7 +40,7 @@ class CarsRepository {
     queryId: number,
     car: CarRequest
   ): Promise<Car | null> {
-    const updateCar = await CarEntity.query().findById(queryId);
+    const updateCar = await CarEntity.query().findById(queryId).whereNull("delete_at");
 
     if (updateCar) {
       await CarEntity.query().findById(queryId).patch({
@@ -46,6 +49,8 @@ class CarsRepository {
         car_size: car.car_size,
         status_rental: car.status_rental,
         car_img: car.car_img,
+        update_by: car.update_by,
+        update_at: car.update_at,
       });
       return updateCar;
     } else {
@@ -53,11 +58,14 @@ class CarsRepository {
     }
   }
 
-  static async deleteCarById(queryId: number): Promise<Car | null> {
-    const deletedCar = await CarEntity.query().findById(queryId);
+  static async deleteCarById(queryId: number, deleted_by: number): Promise<Car | null> {
+    const deletedCar = await CarEntity.query().findById(queryId).whereNull("delete_at");
 
     if (deletedCar) {
-      await CarEntity.query().findById(queryId).delete();
+      await CarEntity.query().findById(queryId).patch({
+        delete_by: deleted_by,
+        delete_at: new Date(),
+      });
       return deletedCar;
     } else {
       return null;

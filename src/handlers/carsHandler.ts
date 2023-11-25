@@ -8,6 +8,7 @@ import cloudinary from "../../config/cloudinary";
 class CarsHandler {
   async getCarsReady(req: Request, res: Response) {
     const carList: Car[] = await CarsService.getCarsReady();
+    console.log("isi carList", carList)
 
     const response: DefaultResponse = {
       status: "OK",
@@ -85,6 +86,8 @@ class CarsHandler {
       return res.status(400).send(response);
     }
 
+    payload.create_by = req.user.id as number;
+
     const createdCar: Car = await CarsService.createCar(payload);
 
     const response: DefaultResponse = {
@@ -120,6 +123,9 @@ class CarsHandler {
       };
       res.status(400).send(response);
     }
+
+    payload.update_by = req.user.id as number;
+
     const updatedCar: Car | null = await CarsService.updateCarById(
       queryId,
       payload
@@ -147,7 +153,8 @@ class CarsHandler {
 
   async deleteCarById(req: Request, res: Response) {
     const queryId: number = parseInt(req.params.id);
-    const deletedCar: Car | null = await CarsService.deleteCarById(queryId);
+    const user_id = req.user.id as number;
+    const deletedCar: Car | null = await CarsService.deleteCarById(queryId, user_id);
 
     if (!deletedCar) {
       const Response: DefaultResponse = {

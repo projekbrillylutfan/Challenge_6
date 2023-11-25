@@ -5,9 +5,10 @@ import fileUploadsCloudinary from "../src/utils/fileUploadsCloudinary";
 import AuthHandler from "./handlers/auth";
 import AuthMiddleware from "./middlewares/auth";
 import UsersHandler from "./handlers/usersHandler";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app: Application = express();
-const PORT: number = 8080;
 
 app.use(express.json());
 
@@ -102,6 +103,6 @@ app.delete(
   userHandler.deleteUserById
 );
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
+app.listen(process.env.APP_PORT, () => {
+  console.log(`Server berjalan di http://localhost:${process.env.APP_PORT}`);
 });
